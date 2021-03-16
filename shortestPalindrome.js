@@ -4,7 +4,7 @@
  */
 const reverseString = s => s.split('').reverse().join('');
 
-function prefixTable(pattern) {
+function prefixTable(pattern, s) {
 /*  主要有兩個重點：
 //   1. 可以透過前一次的最大前後綴結果來推算這一次的最大前後綴長度
 //      舉例來說：
@@ -21,30 +21,30 @@ function prefixTable(pattern) {
 //        但不代表這一輪沒有最大共同前後綴，
 //        有可能與第一個字元 A 發生了匹配。 */
 
-  let failures = [0];
-  let i = 0
-  let j = 1
+  let next = Array(s).fill(0);
 
-  while(j < pattern.length) {
-    if (pattern[i] === pattern[j]) {
-      failures[j] = failures[j-1] + 1;
-      i++;
-    } else {
-      i = 0;
-      failures[j] = (pattern[i] === pattern[j]) ? 1 : 0;
+  for(let i = 1; i < s; i++) {
+    let j = next[i - 1];
+      
+    while(j > 0 && (pattern[i] !== pattern[j])) {
+      j = next[j - 1];
     }
-    j++;
+    if(pattern[i] === pattern[j]) {
+      j++;
+    }
+          
+    next[i] = j;
   }
-  return failures;
+  return next
 }
 // (反轉字串 - 最長匹配字串 ) + 正常字串 = 最短回文字串
 const shortestPalindrome = s => {
   const reverseStr = reverseString(s);
   const combineStr = s + '#' + reverseStr;
   const s_length = combineStr.length;
-  const next = prefixTable(combineStr)
+  const next = prefixTable(combineStr, s_length)
   console.log(reverseStr.substring(0, s.length - next[s_length - 1]) + s);
   return reverseStr.substring(0, s.length - next[s_length - 1]) + s;
 }
 
-shortestPalindrome('abab')
+shortestPalindrome("aacecaaa")
